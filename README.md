@@ -51,6 +51,9 @@ root@goorm:/workspace/djangoBootcamp/mysite# source myvenv/bin/activate
 (myvenv) root@goorm:/workspace/djangoBootcamp/mysite# python3 manage.py runserver 0:80 
 ```
 
+# `base.html` 템플릿 코딩하기
+여기 추가하자
+
 # `settings.py`에서 `URL` 설정
 * `LOGIN_URL` : 로그인이 필요해 로그인 페이지로 리다이렉트 시키는 URL로, 디폴트로 `/accounts/login/` URL을 사용합니다
 * `LOGOUT_URL` : 로그아웃시 사용하는 URL로, 디폴트로 `/accounts/logout/` URL을 사용합니다
@@ -108,8 +111,39 @@ INSTALLED_APPS = [
 | /accounts/password_reset/done/  	| password_reset_done()          	| registration/password_reset_done.html                                                                                	|
 | /accounts/reset/                	| password_reset_confirm()       	| registration/password_reset_confirm.html                                                                             	|
 | /accounts/reset/done/           	| password_reset_complete()      	| registration/password_reset_complete.html                                                                            	|
-| /accounts/register/             	| UserCreateView(CreateView)     	| registration/register.html                                                                                           	|
-| /accounts/register/done/        	| UserCreateDoneTV(TemplateView) 	| registration/register_done.html                                                                                      	|
+| `/accounts/register/`             	| `UserCreateView(CreateView)`     	| registration/register.html                                                                                           	|
+| `/accounts/register/done/`        	| `UserCreateDone(TemplateView)` 	| registration/register_done.html                                                                                      	|
 
+
+`UserCreateView(CreateView)`(`/accounts/register/`)와   `UserCreateDone(TemplateView)`(`/accounts/register/done/`)을 추가합니다  
+
+
+`mysite/djangobootcamp/settings.py`  
+```python
+# auth 추가
+from django.contrib import admin, auth
+from django.urls import path
+# index는 대문, blog는 게시판
+from main.views import index, blog, posting
+# UserCreateView : 게정을 추가하는 View
+# UserCreateDone : 계정 생성이 완료된 후에 보여줄 화면을 처리하는 View
+from main.views import UserCreateView, UserCreateDone
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # 웹사이트의 첫화면은 index 페이지이다 + URL이름은 index이다
+    path('', index, name='index'),
+    # URL:80/blog에 접속하면 blog 페이지 + URL이름은 blog이다
+    path('blog/', blog, name='blog'),
+    # URL:80/blog/숫자로 접속하면 게시글-세부페이지(posting)
+    path('blog/<int:pk>/', posting, name='posting'),
+    
+    # 인증 URL 3개 추가 
+    path('accounts/', auth.urls),
+    path('accounts/register/', UserCreateView.as_view(), name='register'),
+    path('accounts/register/done/', UserCreateDone.as_view(), name='register_done'),
+    
+]
+```
 
 

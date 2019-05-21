@@ -13,7 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
+# auth 추가
+from django.contrib import admin, auth
 from django.urls import path
 # index는 대문, blog는 게시판
 from main.views import index, blog, posting
@@ -31,7 +32,8 @@ urlpatterns = [
     path('blog/<int:pk>/', posting, name='posting'),
     
     # 인증 URL 3개 추가 
-    # 추가중입니다
-    path('accounts/', django.contrib.auth.urls),
+    path('accounts/', auth.urls),
+    path('accounts/register/', UserCreateView.as_view(), name='register'),
+    path('accounts/register/done/', UserCreateDone.as_view(), name='register_done'),
     
 ]
