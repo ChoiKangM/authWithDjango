@@ -1,0 +1,16 @@
+{% extends "frame.html" %}
+
+{% block title %}Register_Done{% endblock %}
+
+{% load staticfiles %}
+{% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1>Registration Completed Successfully</h1>
+    
+    <p>Please enter your username etc.</p>
+    
+    <p><a href="{% url 'login %}">Log in again</a></p>
+</div>
+{% endblock %}

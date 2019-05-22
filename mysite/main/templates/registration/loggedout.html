@@ -1,0 +1,16 @@
+{% extends "frame.html" %}
+
+{% block title %}Logged_Out{% endblock %}
+
+{% load staticfiles %}
+{% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1>Logged out</h1>
+    
+    <p>감사합니다</p>
+    
+    <p><a href="{% url 'login %}">Log in again</a></p>
+</div>
+{% endblock %}

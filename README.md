@@ -205,11 +205,12 @@ INSTALLED_APPS = [
 `UserCreateView(CreateView)`(`/accounts/register/`)와   `UserCreateDone(TemplateView)`(`/accounts/register/done/`)을 추가합니다  
 
 
-`mysite/djangobootcamp/settings.py`  
+`mysite/djangobootcamp/urls.py`  
 ```python
 # auth 추가
-from django.contrib import admin, auth
+from django.contrib import admin
 from django.urls import path
+from django.conf.urls import include
 # index는 대문, blog는 게시판
 from main.views import index, blog, posting
 # UserCreateView : 게정을 추가하는 View
@@ -218,15 +219,15 @@ from main.views import UserCreateView, UserCreateDone
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # 웹사이트의 첫화면은 index 페이지이다 + URL이름은 index이다
-    path('', index, name='index'),
+    # as_view()를 통해 index.html의 내용을 가져옵니다
+    path('', index.as_view(), name='index'),
     # URL:80/blog에 접속하면 blog 페이지 + URL이름은 blog이다
     path('blog/', blog, name='blog'),
     # URL:80/blog/숫자로 접속하면 게시글-세부페이지(posting)
     path('blog/<int:pk>/', posting, name='posting'),
     
     # 인증 URL 3개 추가 
-    path('accounts/', auth.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', UserCreateView.as_view(), name='register'),
     path('accounts/register/done/', UserCreateDone.as_view(), name='register_done'),
     
@@ -234,3 +235,286 @@ urlpatterns = [
 ```
 
 
+뷰를 만들어봅니다.  
+대부분 장고의 `auth`을 통해 만들어져 있어 건드릴게 없습니다.  
+회원가입 부분을 반들어봅니다.  
+`UserCreateView(CreateView)`와 `UserCreateDone(TemplateView)`을 추가합니다  
+
+
+
+`mysite/main/views.py`
+```python
+from django.shortcuts import render
+# View에 Model(Post 게시글) 가져오기
+from .models import Post
+
+from django.views.generic.base import TemplateView
+
+# 인증 시스템에 사용할 라이브라리 및 함수 추가
+from django.views.generic.edit import CreateView
+from django.contrib.auth.forms import UserCreationForm
+from django.core.urlresolvers import reverse_lazy
+
+# User Creation
+class UserCreateView(CreateView):
+    template_name = 'registration/register.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('register_done')
+
+class UserCreateDone(TemplateView):
+    template_name = 'registration/register_done.html'
+
+
+# 하단 내용 동일
+```
+
+회원을 관리하는 부분을 만들어봅니다.  
+HTML과 python을 섞어 씁니다.
+
+
+`mysite/main/templates/frame.html`
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <!-- 페이지 별 title 설정-->
+        <title>{% block title %}Django Tutorial{% endblock %}</title>
+        <!-- 필요한 파일 및 CDN을 추가합니다-->
+        {% load staticfiles %}
+        <!-- 다음에 css를 만져봅니다-->
+        <link rel="stylesheet" type="text/css" href="{% static "css/frame.css" %}" />
+        <link rel="stylesheet" href="{% block extrastyle %}{% endblock %}" />
+        
+    </head>
+    <body>
+        <!-- 회원가입 부분 -->
+        <div id="header">
+            {% if user.is_active %}
+                <h4>
+                    {% firstof user.get_short_name user.get_username %} |
+                    <a href="{% url 'password_change' %}">Change Password</a> |
+                    <a href="{% url 'logout' %}">Logout</a>
+                </h4>
+            {% else %}
+                <h4>
+                    Welcome |
+                    <a href="{% url 'login' %}">Login</a> |
+                    <a href="{% url 'register %}">Register</a>
+                </h4>
+            {% endif %}
+        </div>
+        
+        <!-- 하단 내용 동일 -->
+
+```
+
+
+인증에 필요한 페이지들을 만들어봅니다  
+`mysite/main/templates` 폴더 안에 `registration` 폴더를 만들어봅니다  
+인증에 필요한 페이지들  
+
+```
+|--registration
+    |--login.html
+    |--register.html
+    |--register_done.html
+    |--password_change_form.html
+    |--password_change_done.html
+    |--loggedout.html
+```
+`registration` 폴더와 `html`파일 만들기 
+
+```console
+(myvenv)root@goorm:/workspace/djangoBootcamp/mysite# mkdir main/templates/registration/
+```
+```console
+(myvenv)root@goorm:/workspace/djangoBootcamp/mysite# cd main/templates/registration/
+```
+```console
+(myvenv) root@goorm:/workspace/djangoBootcamp/mysite/main/templates/registration# touch login.html register.html register_done.html password_change_form.html password_change_done.html loggedout.html
+```
+
+
+
+`mysite/main/templates/registration/login.html`
+```html
+{% extends "frame.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% load staticfiles %}
+{% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1>Please login</h1>
+    <form action="." method="post">{% csrf_token %}
+        {% if form.errors %}
+            <p class="errornote">Wrong! Please correct the errors below</p>
+        {% endif %}
+        
+        <p>Please enter your id and password</p>
+        <fieldset class="aligned">
+            <div class="form-row">
+                {{ form.username.label_tag }} {{ form.username }}
+            </div>
+            <div class="form-row">
+                {{ form.password.label_tag }} {{ form.password }}
+            </div>
+        </fieldset>
+        <div class="submit-row">
+            <input type="submit" value="Log in"/>
+            <input type="hidden" name="next" value="{{ next }}"/>
+        </div>
+        <script type="text/javascript">document.getElementById('id_username').focus();
+        </script>
+    </form>
+</div>
+{% endblock %}
+
+```
+
+
+`mysite/main/templates/registration/register.html`
+```html
+{% extends "frame.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% load staticfiles %}
+{% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1>New User Registration</h1>
+    <form action="." method="post">{% csrf_token %}
+        {% if form.errors %}
+            <p class="errornote">Wrong! Please correct the errors below</p>
+        {% endif %}
+        
+        <p>Please enter your username, password</p>
+        <fieldset class="aligned">
+            <div class="form-row">
+                {{ form.username.label_tag }} {{ form.username }}
+            </div>
+            <div class="form-row">
+                {{ form.password1.label_tag }} {{ form.password1 }}
+            </div>
+            <div class="form-row">
+                {{ form.password2.label_tag }} {{ form.password2 }}
+            </div>
+        </fieldset>
+        <div class="submit-row">
+            <input type="submit" value="Register"/>
+        </div>
+        <script type="text/javascript">document.getElementById('id_username').focus();
+        </script>
+    </form>
+</div>
+{% endblock %}
+
+```
+
+`mysite/main/templates/registration/register_done.html`
+```html
+{% extends "frame.html" %}
+
+{% block title %}Register_Done{% endblock %}
+
+{% load staticfiles %}
+{% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1>Registration Completed Successfully</h1>
+    
+    <p>Please enter your username etc.</p>
+    
+    <p><a href="{% url 'login %}">Log in again</a></p>
+</div>
+{% endblock %}
+
+```
+
+`mysite/main/templates/registration/password_change_form.html`
+```html
+{% extends "frame.html" %}
+
+{% block title %}Password_Change_form{% endblock %}
+
+{% load staticfiles %}
+{% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1>{{ title }}</h1>
+    <form action="." method="post">{% csrf_token %}
+        {% if form.errors %}
+            <p class="errornote">Wrong! Please correct the errors below</p>
+        {% endif %}
+        
+        <p>Please enter your old password for security's sake, and then enter your new password twice.</p>
+        <fieldset class="aligned">
+            <div class="form-row">
+                {{ form.old_password.label_tag }} {{ form.old_password }}
+            </div>
+            <div class="form-row">
+                {{ form.password1.label_tag }} {{ form.password1 }}
+            </div>
+            <div class="form-row">
+                {{ form.password2.label_tag }} {{ form.password2 }}
+            </div>
+        </fieldset>
+        <div class="submit-row">
+            <input type="submit" value="Password Change"/>
+        </div>
+        <script type="text/javascript">document.getElementById('id_old_password').focus();
+        </script>
+    </form>
+</div>
+{% endblock %}
+
+```
+
+`mysite/main/templates/registration/password_change_done.html`
+```html
+{% extends "frame.html" %}
+
+{% block title %}Password_Change_Done{% endblock %}
+
+{% load staticfiles %}
+{% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1>{{ title }}</h1>
+    
+    <p>Your password was changed</p>
+    
+</div>
+{% endblock %}
+
+```
+
+`mysite/main/templates/registration/logged_out.html`
+```html
+{% extends "frame.html" %}
+
+{% block title %}Logged_Out{% endblock %}
+
+{% load staticfiles %}
+{% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1>Logged out</h1>
+    
+    <p>감사합니다</p>
+    
+    <p><a href="{% url 'login %}">Log in again</a></p>
+</div>
+{% endblock %}
+
+```

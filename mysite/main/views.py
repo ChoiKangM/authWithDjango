@@ -5,18 +5,18 @@ from .models import Post
 from django.views.generic.base import TemplateView
 
 # 인증 시스템에 사용할 라이브라리 및 함수 추가
-# from django.views.generic.edit import CreateView
-# from django.contrib.auth.forms import UserCreationForm
-# from django.core.urlresolvers import reverse_lazy
+from django.views.generic.edit import CreateView
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
 
 # User Creation
-# class UserCreateView(CreateView):
-#     template_name = 'registration/register.html'
-#     form_class = UserCreationForm
-#     success_url = reverse_lazy('register_done')
+class UserCreateView(CreateView):
+    template_name = 'registration/register.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('register_done')
 
-# class UserCreateDone(request):
-#     template_name = 'registration/register_done.html'
+class UserCreateDone(TemplateView):
+    template_name = 'registration/register_done.html'
 
 
 # 하단 내용 동일

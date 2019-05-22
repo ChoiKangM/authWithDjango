@@ -13,6 +13,25 @@
         
     </head>
     <body>
+        <!-- 회원가입 부분 -->
+        <div id="header">
+            {% if user.is_active %}
+                <h4>
+                    {% firstof user.get_short_name user.get_username %} |
+                    <a href="{% url 'password_change' %}">Change Password</a> |
+                    <a href="{% url 'logout' %}">Logout</a>
+                </h4>
+            {% else %}
+                <h4>
+                    Welcome |
+                    <a href="{% url 'login' %}">Login</a> |
+                    <a href="{% url 'register' %}">Register</a>
+                </h4>
+            {% endif %}
+        </div>
+        
+        <!-- 하단 내용 동일 -->
+        
         <!-- 각 앱에서 만드는 페이지로 채울 부분-->
         {% block content %}{% endblock %}
         <!-- footer가 있다면 사용할 부분 -->
