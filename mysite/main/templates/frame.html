@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <!-- 페이지 별 title 설정-->
+        <title>{% block title %}Django Tutorial{% endblock %}</title>
+        <!-- 필요한 파일 및 CDN을 추가합니다-->
+        {% load staticfiles %}
+        <!-- 다음에 css를 만져봅니다-->
+        <link rel="stylesheet" type="text/css" href="{% static "css/frame.css" %}" />
+        <link rel="stylesheet" href="{% block extrastyle %}{% endblock %}" />
+        
+    </head>
+    <body>
+        <!-- 각 앱에서 만드는 페이지로 채울 부분-->
+        {% block content %}{% endblock %}
+        <!-- footer가 있다면 사용할 부분 -->
+        {% block footer %}{% endblock %}
+    </body>
+</html>

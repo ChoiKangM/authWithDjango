@@ -2,26 +2,28 @@ from django.shortcuts import render
 # View에 Model(Post 게시글) 가져오기
 from .models import Post
 
+from django.views.generic.base import TemplateView
+
 # 인증 시스템에 사용할 라이브라리 및 함수 추가
-from django.views.generic.edit import CreateView
-from django.contrib.auth.forms import UserCreationForm
-from django.core.urlresolvers import reverse_lazy
+# from django.views.generic.edit import CreateView
+# from django.contrib.auth.forms import UserCreationForm
+# from django.core.urlresolvers import reverse_lazy
 
 # User Creation
-class UserCreateView(CreateView):
-    template_name = 'registration/register.html'
-    form_class = UserCreationForm
-    success_url = reverse_lazy('register_done')
+# class UserCreateView(CreateView):
+#     template_name = 'registration/register.html'
+#     form_class = UserCreationForm
+#     success_url = reverse_lazy('register_done')
 
-class UserCreateDone(request):
-    template_name = 'registration/register_done.html'
+# class UserCreateDone(request):
+#     template_name = 'registration/register_done.html'
 
 
 # 하단 내용 동일
 
-# index.html 페이지를 부르는 index 함수
-def index(request):
-    return render(request, 'main/index.html')
+# TemplateView를 활용한 main/index/html
+class index(TemplateView):
+    template_name = 'main/index.html'
 
 # blog.html 페이지를 부르는 blog 함수
 def blog(request):

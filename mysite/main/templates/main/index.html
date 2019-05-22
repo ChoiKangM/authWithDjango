@@ -1,11 +1,16 @@
-<html>
-    <head>
-        <title>Django Tutorial</title>
-    </head>
-    <body>
-        <h1>메인 페이지입니다</h1>
-        <!-- 정적 이미지 불러오기 -->
-        {% load static %}
-        <img src="{% static 'firstImg.png' %}">
-    </body>
-</html>
+{% extends "frame.html" %}
+
+{% block content %}
+    <h1>메인 페이지입니다</h1>
+    <!-- 정적 이미지 불러오기 -->
+    {% load static %}
+    <img src="{% static 'firstImg.png' %}">
+{% endblock content%}
+
+{% block footer %}
+    <div id="footer" style="border-top: 1px solid #ccc">
+        This is footer area
+    </div>
+{% endblock footer %}
+
+
