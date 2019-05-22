@@ -51,8 +51,95 @@ root@goorm:/workspace/djangoBootcamp/mysite# source myvenv/bin/activate
 (myvenv) root@goorm:/workspace/djangoBootcamp/mysite# python3 manage.py runserver 0:80 
 ```
 
-# `base.html` 템플릿 코딩하기
-여기 추가하자
+# `frame.html` 템플릿 코딩하기
+템플릿 상속을 이용해 사이트 전체의 외관을 통일합니다.  
+공통 템플릿이므로 개별 애플리케이션 템플릿이 아닌 프로텍트 템플릿 디렉토리에 생성합니다.  
+`mysite/main/templates` 위치에 `frame.html`을 만듭니다.  
+
+기존의 `index.html`을 복사해와 뼈대를 잡습니다.  
+`urls.py`, `views.py` 을 수정하고 다시 고치러 옵니다
+
+`mysite/main/templates/frame.html`
+```html
+<html>
+    <head>
+        <title>Django Tutorial</title>
+    </head>
+    <body>
+        <h1>메인 페이지입니다</h1>
+        <!-- 정적 이미지 불러오기 -->
+        {% load static %}
+        <img src="{% static 'firstImg.png' %}">
+    </body>
+</html>
+```
+`views.py`의 기존 index `함수`를 index `클래스`로 바꾸어  
+`frame.html`을 상속하도록 합니다  
+
+`mysite/main/views.py`
+```python
+from django.shortcuts import render
+# View에 Model(Post 게시글) 가져오기
+from .models import Post
+
+# django의 제너릭 뷰를 사용합니다
+from django.views.generic.frame import TemplateView
+
+
+# TemplateView를 활용한 main/index/html 
+class index(TemplateView):
+    template_name = 'main/index.html'
+
+# 하단 내용 동일
+```
+`mysite/djangobootcamp/urls.py`
+```python
+# 상단 내용 동일
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # as_view()를 통해 index.html의 내용을 가져옵니다
+    path('', index.as_view(), name='index'),
+    ...
+]
+# 하단 내용 동일
+```
+프로젝트 템플릿 디렉터리를 설정합니다  
+`mysite/djangobootcamp/settings.py`
+
+```python
+# mysite/main/templates
+TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+
+```
+
+
+
+`frame.html`를 통해 웹사이트의 구조를 잡아봅니다
+`mysite/main/templates/frame.html`
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <!-- 페이지 별 title 설정-->
+        <title>{% block title %}Django Tutorial{% endblock %}</title>
+        <!-- 필요한 파일 및 CDN을 추가합니다-->
+        {% load staticfiles %}
+        <!-- 다음에 css를 만져봅니다-->
+        <link rel="stylesheet" type="text/css" href="{% static "css/frame.css" %}" />
+        <link rel="stylesheet" href="{% block extrastyle %}{% endblock %}" />
+        
+    </head>
+    <body>
+        <!-- 각 앱에서 만드는 페이지로 채울 부분-->
+        {% block content %}{% endblock %}
+        <!-- footer가 있다면 사용할 부분 -->
+        {% block footer %}{% endblock %}
+    </body>
+</html>
+```
 
 # `settings.py`에서 `URL` 설정
 * `LOGIN_URL` : 로그인이 필요해 로그인 페이지로 리다이렉트 시키는 URL로, 디폴트로 `/accounts/login/` URL을 사용합니다
