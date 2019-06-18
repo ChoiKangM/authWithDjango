@@ -18,10 +18,10 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 # index는 대문, blog는 게시판
-from main.views import index, blog, posting
+from main.views import index, blog, posting, UserCreateView, UserCreateDone
 # UserCreateView : 게정을 추가하는 View
 # UserCreateDone : 계정 생성이 완료된 후에 보여줄 화면을 처리하는 View
-from main.views import UserCreateView, UserCreateDone
+# from main.views import 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,7 +35,5 @@ urlpatterns = [
     # 인증 URL 3개 추가 
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', UserCreateView.as_view(), name='register'),
-    path('accounts/register/done/', UserCreateDone.as_view(), 
-         name='register_done'),
-    
+    path('accounts/register/done/', UserCreateDone.as_view(), name='register_done'),   
 ]

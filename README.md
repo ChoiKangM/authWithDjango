@@ -158,7 +158,7 @@ STATICFILES_DIRS = (
 # Django에서 디폴트로 지정된 항목들
 # LOGIN_URL = '/accounts/login/'
 # LOGOUT_URL = '/accounts/logout/'
-LOGIN_REDIRECT_URL = '/
+LOGIN_REDIRECT_URL = '/'
 ```
 
 # `settings.py`에 설치된 앱 확인

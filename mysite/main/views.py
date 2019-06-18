@@ -7,6 +7,7 @@ from django.views.generic.base import TemplateView
 # 인증 시스템에 사용할 라이브라리 및 함수 추가
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
+# 여기 뭐해야되너?
 from django.urls import reverse_lazy
 
 # User Creation
