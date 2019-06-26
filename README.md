@@ -237,7 +237,7 @@ urlpatterns = [
 
 뷰를 만들어봅니다.  
 대부분 장고의 `auth`을 통해 만들어져 있어 건드릴게 없습니다.  
-회원가입 부분을 반들어봅니다.  
+회원가입 부분을 만들어봅니다.  
 `UserCreateView(CreateView)`와 `UserCreateDone(TemplateView)`을 추가합니다  
 
 
@@ -271,7 +271,7 @@ class UserCreateDone(TemplateView):
 회원을 관리하는 부분을 만들어봅니다.  
 HTML과 python을 섞어 씁니다.
 
-
+![frame+navbar](img/frame_navbar.png)
 `mysite/main/templates/frame.html`
 ```html
 <!DOCTYPE html>
@@ -336,7 +336,7 @@ HTML과 python을 섞어 씁니다.
 (myvenv) root@goorm:/workspace/djangoBootcamp/mysite/main/templates/registration# touch login.html register.html register_done.html password_change_form.html password_change_done.html loggedout.html
 ```
 
-
+로그인하는 화면을 만듭니다    
 
 `mysite/main/templates/registration/login.html`
 ```html
@@ -350,20 +350,32 @@ HTML과 python을 섞어 씁니다.
 {% block content %}
 <div id="content">
     <h1>Please login</h1>
+    <!-- 아이디, 비밀번호 입력창-->
     <form action="." method="post">{% csrf_token %}
+        <!-- 에러 표시-->
         {% if form.errors %}
             <p class="errornote">Wrong! Please correct the errors below</p>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endfor %}
         {% endif %}
         
         <p>Please enter your id and password</p>
         <fieldset class="aligned">
+            <!-- 아이디 입력 -->
             <div class="form-row">
                 {{ form.username.label_tag }} {{ form.username }}
             </div>
+            <!-- 비밀번호 입력 -->
             <div class="form-row">
                 {{ form.password.label_tag }} {{ form.password }}
             </div>
         </fieldset>
+        <!-- 제출 -->
         <div class="submit-row">
             <input type="submit" value="Log in"/>
             <input type="hidden" name="next" value="{{ next }}"/>
@@ -373,10 +385,10 @@ HTML과 python을 섞어 씁니다.
     </form>
 </div>
 {% endblock %}
-
 ```
+![login](img/login.html)
 
-
+회원가입 페이지 만듭니다  
 `mysite/main/templates/registration/register.html`
 ```html
 {% extends "frame.html" %}
@@ -389,23 +401,36 @@ HTML과 python을 섞어 씁니다.
 {% block content %}
 <div id="content">
     <h1>New User Registration</h1>
+    <!-- 아이디, 비밀번호 입력창-->
     <form action="." method="post">{% csrf_token %}
+        <!-- 에러 표시-->
         {% if form.errors %}
             <p class="errornote">Wrong! Please correct the errors below</p>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endfor %}
         {% endif %}
         
         <p>Please enter your username, password</p>
         <fieldset class="aligned">
+            <!-- 아이디 입력 -->
             <div class="form-row">
                 {{ form.username.label_tag }} {{ form.username }}
             </div>
+            <!-- 비밀번호 입력 1 -->
             <div class="form-row">
                 {{ form.password1.label_tag }} {{ form.password1 }}
             </div>
+            <!-- 비밀번호 입력 2 -->
             <div class="form-row">
                 {{ form.password2.label_tag }} {{ form.password2 }}
             </div>
         </fieldset>
+        <!-- 제출 -->
         <div class="submit-row">
             <input type="submit" value="Register"/>
         </div>
@@ -414,9 +439,10 @@ HTML과 python을 섞어 씁니다.
     </form>
 </div>
 {% endblock %}
-
 ```
+![registeration](img/registeration.png)
 
+회원가입이 완료되었음을 알립니다.  
 `mysite/main/templates/registration/register_done.html`
 ```html
 {% extends "frame.html" %}
@@ -427,17 +453,20 @@ HTML과 python을 섞어 씁니다.
 {% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
 
 {% block content %}
+<!-- 회원가입 완료 창-->
 <div id="content">
     <h1>Registration Completed Successfully</h1>
     
     <p>Please enter your username etc.</p>
     
-    <p><a href="{% url 'login %}">Log in again</a></p>
+    <p><a href="{% url 'login' %}">Log in again</a></p>
 </div>
 {% endblock %}
-
 ```
+![registeration_done](img/registeration_done.png)
 
+비밀번호 변경합니다  
+현재 이 부분이 `Admin`과 form 객체가 꼬여 `Admin`의 UI가 보입니다 ㅠㅠ
 `mysite/main/templates/registration/password_change_form.html`
 ```html
 {% extends "frame.html" %}
@@ -450,23 +479,36 @@ HTML과 python을 섞어 씁니다.
 {% block content %}
 <div id="content">
     <h1>{{ title }}</h1>
+    <!-- 비밀번호 변경-->
     <form action="." method="post">{% csrf_token %}
+        <!-- 에러 표시-->
         {% if form.errors %}
             <p class="errornote">Wrong! Please correct the errors below</p>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endfor %}
         {% endif %}
         
         <p>Please enter your old password for security's sake, and then enter your new password twice.</p>
         <fieldset class="aligned">
+            <!-- 기존 비밀번호 -->
             <div class="form-row">
                 {{ form.old_password.label_tag }} {{ form.old_password }}
             </div>
+            <!-- 새 비밀번호 1 -->
             <div class="form-row">
                 {{ form.password1.label_tag }} {{ form.password1 }}
             </div>
+            <!-- 새 비밀번호 2 -->
             <div class="form-row">
                 {{ form.password2.label_tag }} {{ form.password2 }}
             </div>
         </fieldset>
+        <!-- 제출 -->
         <div class="submit-row">
             <input type="submit" value="Password Change"/>
         </div>
@@ -477,7 +519,8 @@ HTML과 python을 섞어 씁니다.
 {% endblock %}
 
 ```
-
+![password_change_form](img/password_change_form.png)
+비밀번호가 변경되었음을 알립니다  
 `mysite/main/templates/registration/password_change_done.html`
 ```html
 {% extends "frame.html" %}
@@ -488,6 +531,7 @@ HTML과 python을 섞어 씁니다.
 {% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
 
 {% block content %}
+<!-- 비밀번호 변경 완료 -->
 <div id="content">
     <h1>{{ title }}</h1>
     
@@ -497,7 +541,10 @@ HTML과 python을 섞어 씁니다.
 {% endblock %}
 
 ```
+![password_change_done](img/password_change_done.png)
 
+이 부분도 `Admin`과 객체가 꼬여 작동이 제대로 안됩니다 ㅠㅠ
+로그아웃이 완료되었음을 알립니다  
 `mysite/main/templates/registration/logged_out.html`
 ```html
 {% extends "frame.html" %}
@@ -518,3 +565,4 @@ HTML과 python을 섞어 씁니다.
 {% endblock %}
 
 ```
+![loggout](img/loggout.png)  
